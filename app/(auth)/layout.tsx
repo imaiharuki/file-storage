@@ -66,7 +66,16 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
       <section className="flex flex-1 flex-col items-center bg-white p-4 py-10 lg:justify-center lg:p-10 lg:py-0">
         <div className="mb-16 lg:hidden">
-          {catImageUrl && <CatImage initialImageUrl={catImageUrl} />}
+          <div className="flex items-center font-semibold gap-4">
+            <Image
+              src={"/favicon_io/favicon.ico"}
+              alt="logo"
+              width={40}
+              height={40}
+              className="h-auto"
+            />
+            <h1 className="text-2xl text-dark-200"> FILE Storage</h1>
+          </div>
         </div>
         {children}
       </section>
