@@ -192,10 +192,10 @@
 
   /* Sidebar & MobileNavigation */
   .nav-icon {
-    @apply w-6 filter invert opacity-25 !important;
+    @apply w-6 filter invert-0 opacity-25  !important;
   }
   .nav-icon-active {
-    @apply invert-0 opacity-100 !important;
+    @apply invert opacity-100 !important;
   }
 
   /* =====  STYLE CLASSES */
