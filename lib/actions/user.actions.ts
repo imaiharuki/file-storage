@@ -5,6 +5,7 @@ import { appwriteConfig } from "@/lib/appwrite/config";
 import { ID, Query } from "node-appwrite";
 import { getCatImage } from "../getCatImage";
 import { parseStringify } from "../utils";
+import { cookies } from "next/headers";
 
 // Create account flow
 // 1. User enters full name and email
@@ -32,7 +33,7 @@ const handleError = (error: unknown, message: string) => {
   throw error;
 };
 
-const sendEmailOTP = async ({ email }: { email: string }) => {
+export const sendEmailOTP = async ({ email }: { email: string }) => {
   const { account } = await createAdminClient();
 
   try {
@@ -51,7 +52,12 @@ export const createAccount = async ({
   fullName: string;
   email: string;
 }) => {
+  console.log("hello", fullName, email);
+
   const existingUser = await getUserByEmail(email);
+
+  // debug
+  if (existingUser) console.log("hello", existingUser);
 
   const accountId = await sendEmailOTP({ email });
   if (!accountId) {
@@ -68,11 +74,38 @@ export const createAccount = async ({
       {
         fullName,
         email,
-        avatar: getCatImage(),
+        avatar: await getCatImage(),
         accountId,
       }
     );
+    // debug
+    console.log(accountId);
   }
 
   return parseStringify({ accountId });
+};
+
+export const verifySecret = async ({
+  accountId,
+  password,
+}: {
+  accountId: string;
+  password: string;
+}) => {
+  try {
+    const { account } = await createAdminClient();
+
+    const session = await account.createSession(accountId, password);
+
+    (await cookies()).set("appwrite-session", session.secret, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "strict",
+      secure: true,
+    });
+
+    return parseStringify({ sessionId: session.$id });
+  } catch (error) {
+    handleError(error, "Failed to verify secret");
+  }
 };

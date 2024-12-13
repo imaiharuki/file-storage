@@ -1,4 +1,4 @@
-export async function getCatImage() {
+export async function getCatImage(): Promise<string> {
   const timestamp = new Date().getTime();
   const res = await fetch("https://api.thecatapi.com/v1/images/search");
 
@@ -6,5 +6,5 @@ export async function getCatImage() {
     throw new Error("Failed to fetch cat image");
   }
   const data = await res.json();
-  return data[0].url;
+  return data[0].url as string;
 }
