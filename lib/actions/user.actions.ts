@@ -63,6 +63,8 @@ export const createAccount = async ({
   // if (existingUser) console.log("hello", existingUser);
 
   const accountId = await sendEmailOTP({ email });
+  // accountId と existingUser.accountIdは同じ値を持つ
+
   if (!accountId) {
     throw new Error("Failed to create account");
   }
@@ -149,6 +151,11 @@ export const signInUser = async ({ email }: { email: string }) => {
     // User exists, send OTP
     if (existingUser) {
       await sendEmailOTP({ email });
+
+      //
+      // debug
+      // console.log("accoundId : user.actions.ts | ", accountId);
+      // console.log("existingUser : user.actions.ts | ", existingUser);
       return parseStringify({ accountId: existingUser.accountId });
     }
 
