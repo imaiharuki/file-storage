@@ -1,12 +1,14 @@
 "use server";
 
-import { createAdminClient } from "@/lib/appwrite";
+import { createAdminClient, createSessionClient } from "@/lib/appwrite";
 import { appwriteConfig } from "@/lib/appwrite/config";
 import { ID, Query } from "node-appwrite";
 import { getCatImage } from "../getCatImage";
 import { parseStringify } from "../utils";
 import { cookies } from "next/headers";
 import { getAvatarPlaceHolderUrl } from "@/constants";
+import { redirect } from "next/navigation";
+import { error } from "console";
 
 // Create account flow
 // 1. User enters full name and email
@@ -53,12 +55,12 @@ export const createAccount = async ({
   fullName: string;
   email: string;
 }) => {
-  console.log("hello", fullName, email);
+  // console.log("hello", fullName, email);
 
   const existingUser = await getUserByEmail(email);
 
   // debug
-  if (existingUser) console.log("hello", existingUser);
+  // if (existingUser) console.log("hello", existingUser);
 
   const accountId = await sendEmailOTP({ email });
   if (!accountId) {
@@ -75,12 +77,12 @@ export const createAccount = async ({
       {
         fullName,
         email,
-        avatar: getAvatarPlaceHolderUrl(),
+        avatar: await getAvatarPlaceHolderUrl(),
         accountId,
       }
     );
     // debug
-    console.log(accountId);
+    // console.log(accountId);
   }
 
   return parseStringify({ accountId });
@@ -108,5 +110,50 @@ export const verifySecret = async ({
     return parseStringify({ sessionId: session.$id });
   } catch (error) {
     handleError(error, "Failed to verify secret");
+  }
+};
+
+export const getCurrentUser = async () => {
+  const { databases, account } = await createSessionClient();
+
+  const result = await account.get();
+  console.log("result", result);
+  const user = await databases.listDocuments(
+    appwriteConfig.databaseId,
+    appwriteConfig.usersCollectionId,
+    [Query.equal("accountId", result.$id)]
+  );
+
+  if (user.total <= 0) return null;
+  console.log("user", user.documents[0]);
+  return parseStringify(user.documents[0]);
+};
+
+export const signOutUser = async () => {
+  const { account } = await createSessionClient();
+
+  try {
+    await account.deleteSession("current");
+    (await cookies()).delete("appwrite-session");
+  } catch (error) {
+    handleError(error, "Failed to sign out user");
+  } finally {
+    redirect("/sign-in");
+  }
+};
+
+export const signInUser = async ({ email }: { email: string }) => {
+  try {
+    const existingUser = await getUserByEmail(email);
+
+    // User exists, send OTP
+    if (existingUser) {
+      await sendEmailOTP({ email });
+      return parseStringify({ accountId: existingUser.accountId });
+    }
+
+    return parseStringify({ accountId: null, error: "User not found" });
+  } catch (error) {
+    handleError(error, "Failed to sign in user");
   }
 };

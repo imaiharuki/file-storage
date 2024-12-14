@@ -5,6 +5,7 @@ import { Account, Avatars, Client, Databases, Storage } from "node-appwrite";
 import { appwriteConfig } from "./config";
 import { cookies } from "next/headers";
 
+// ユーザーに関する情報を取得する関数
 export const createSessionClient = async () => {
   const client = new Client()
     .setEndpoint(appwriteConfig.endpointUrl)
@@ -24,7 +25,7 @@ export const createSessionClient = async () => {
     },
   };
 };
-
+// 管理者に関する情報を取得する関数
 export const createAdminClient = async () => {
   const client = new Client()
     .setEndpoint(appwriteConfig.endpointUrl)

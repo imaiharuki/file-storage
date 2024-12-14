@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { getCatImage } from "@/lib/getCatImage";
 import Link from "next/link";
-import { createAccount } from "@/lib/actions/user.actions";
+import { createAccount, signInUser } from "@/lib/actions/user.actions";
 import OTPModal from "@/components/OTPModal";
 
 type FormType = "sign-in" | "sign-up";
@@ -67,11 +67,15 @@ const AuthForm = ({ type }: { type: FormType }) => {
     setIsLoading(true);
     seterrorMessage("");
     try {
-      console.log(values);
-      const user = await createAccount({
-        fullName: values.fullName || "",
-        email: values.email,
-      });
+      console.log("values : AuthForm.tsx | ", values);
+      const user =
+        type === "sign-up"
+          ? await createAccount({
+              fullName: values.fullName || "",
+              email: values.email,
+            })
+          : await signInUser({ email: values.email });
+
       console.log(user.accountId);
       setaccountId(user.accountId);
     } catch (error) {

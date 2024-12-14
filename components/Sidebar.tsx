@@ -1,30 +1,39 @@
 "use client";
 
 import { navItems } from "@/constants";
+import { getCurrentUser } from "@/lib/actions/user.actions";
 import { getCatImage } from "@/lib/getCatImage";
 import { cn } from "@/lib/utils";
 import { LayoutDashboard } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
-const Sidebar = () => {
+interface Props {
+  fullName: string;
+  avatar: string;
+  email: string;
+}
+
+const Sidebar = ({ fullName, avatar, email }: Props) => {
   const pathname = usePathname();
-  const [catImageUrl, setCatImageUrl] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchCatImage = async () => {
-      try {
-        const imageUrl = await getCatImage();
-        setCatImageUrl(imageUrl);
-      } catch (error) {
-        console.error("Error fetching cat image", error);
-      }
-    };
+  // catImageUrlを取得するためのコード
+  // const [catImageUrl, setCatImageUrl] = useState<string | null>(null);
 
-    fetchCatImage();
-  }, []);
+  // useEffect(() => {
+  //   const fetchCatImage = async () => {
+  //     try {
+  //       const imageUrl = await getCatImage();
+  //       setCatImageUrl(imageUrl);
+  //     } catch (error) {
+  //       console.error("Error fetching cat image", error);
+  //     }
+  //   };
+
+  //   fetchCatImage();
+  // }, []);
 
   return (
     <aside className="sidebar">
@@ -80,15 +89,18 @@ const Sidebar = () => {
       />
 
       <div className="sidebar-user-info">
-        {catImageUrl && (
-          <Image
-            src={catImageUrl}
-            alt="avatar"
-            width={44}
-            height={44}
-            className="sidebar-user-avatar"
-          />
-        )}
+        <Image
+          src={avatar}
+          alt="avatar"
+          width={44}
+          height={44}
+          className="sidebar-user-avatar"
+        />
+
+        <div className="hidden lg:block">
+          <p className="subtitle-2 capitalize">{fullName}</p>
+          <p className="caption">{email}</p>
+        </div>
       </div>
     </aside>
   );
