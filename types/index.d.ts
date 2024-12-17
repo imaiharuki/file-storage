@@ -1,5 +1,7 @@
 /* eslint-disable no-unused-vars */
 
+import { URL } from "url";
+
 declare type FileType = "document" | "image" | "video" | "audio" | "other";
 
 declare interface ActionType {

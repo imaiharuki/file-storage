@@ -22,36 +22,43 @@ const FileUploader = ({ ownerId, accountId, className }: Props) => {
   const [Files, setFiles] = useState<File[]>([]);
   const { toast } = useToast();
 
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    // Do something with the files
-    setFiles(acceptedFiles);
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      // Do something with the files
+      setFiles(acceptedFiles);
 
-    const uploadPromises = acceptedFiles.map(async (file) => {
-      if (file.size > MAX_FILE_SIZE) {
-        setFiles((prevFiles) => prevFiles.filter((f) => f.name !== file.name));
+      const uploadPromises = acceptedFiles.map(async (file) => {
+        if (file.size > MAX_FILE_SIZE) {
+          setFiles((prevFiles) =>
+            prevFiles.filter((f) => f.name !== file.name)
+          );
 
-        toast({
-          description: (
-            <p className="body-2 text-white">
-              <span className="font-semibold">{file.name}</span> is too large.
-              Max file size is 50MB
-            </p>
-          ),
-          className: "error-toast",
-        });
-      }
-      return uploadFile({ file, ownerId, accountId, path }).then(
-        (uploadFile) => {
-          if (uploadFile) {
-            setFiles((prevFiles) =>
-              prevFiles.filter((f) => f.name !== file.name)
-            );
-          }
+          toast({
+            description: (
+              <p className="body-2 text-white">
+                <span className="font-semibold">{file.name}</span> is too large.
+                Max file size is 50MB
+              </p>
+            ),
+            className: "error-toast",
+          });
         }
-      );
-    });
-  }, []);
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+        return uploadFile({ file, ownerId, accountId, path }).then(
+          (uploadFile) => {
+            if (uploadFile) {
+              setFiles((prevFiles) =>
+                prevFiles.filter((f) => f.name !== file.name)
+              );
+            }
+          }
+        );
+      });
+
+      await Promise.all(uploadPromises);
+    },
+    [ownerId, accountId, path]
+  );
+  const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
   const handleRemoveFile = (
     e: React.MouseEvent<SVGSVGElement, MouseEvent>,

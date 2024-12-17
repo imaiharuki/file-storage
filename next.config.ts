@@ -3,6 +3,11 @@ import { hostname } from "os";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "100MB",
+    },
+  },
   images: {
     remotePatterns: [
       {
@@ -12,6 +17,11 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "*.media.tumblr.com",
+      },
+      {
+        protocol: "https",
+        hostname: "cloud.appwrite.io",
+        pathname: "/v1/storage/buckets/**",
       },
     ],
   },

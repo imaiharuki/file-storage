@@ -119,7 +119,8 @@ export const getCurrentUser = async () => {
   const { databases, account } = await createSessionClient();
 
   const result = await account.get();
-  console.log("result", result);
+  // debug
+  // console.log("result / getCurrentUser : user.actions.ts | \n", result);
   const user = await databases.listDocuments(
     appwriteConfig.databaseId,
     appwriteConfig.usersCollectionId,
@@ -127,7 +128,11 @@ export const getCurrentUser = async () => {
   );
 
   if (user.total <= 0) return null;
-  console.log("user", user.documents[0]);
+  // debug
+  // console.log(
+  //   "user.document[0] / getCurrentUser : user.actions.ts | \n",
+  //   user.documents[0]
+  // );
   return parseStringify(user.documents[0]);
 };
 
