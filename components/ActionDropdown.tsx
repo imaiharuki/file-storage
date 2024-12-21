@@ -111,6 +111,9 @@ const ActionDropdown = ({ file }: { file: Models.Document }) => {
                   )
                 ) {
                   setisModalOpen(true);
+                  {
+                    ("hello");
+                  }
                 }
               }}
             >
