@@ -8,15 +8,17 @@ import ActionDropdown from "./ActionDropdown";
 
 const Card = ({ file }: { file: Models.Document }) => {
   return (
-    <Link href={file.url} target="_blank" className="file-card">
+    <div className="file-card">
       <div className="flex justify-between">
-        <Thumbnail
-          type={file.type}
-          extension={file.extension}
-          url={file.url}
-          className="!size-20"
-          imageClassName="!size-11"
-        />
+        <Link href={file.url} target="_blank">
+          <Thumbnail
+            type={file.type}
+            extension={file.extension}
+            url={file.url}
+            className="!size-20"
+            imageClassName="!size-11"
+          />
+        </Link>
 
         <div className="flex flex-col items-end justify-between">
           <ActionDropdown file={file} />
@@ -34,7 +36,7 @@ const Card = ({ file }: { file: Models.Document }) => {
           By: {file.owner.fullName}
         </p>
       </div>
-    </Link>
+    </div>
   );
 };
 
