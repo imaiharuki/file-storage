@@ -92,7 +92,7 @@ export const getFiles = async () => {
       appwriteConfig.filesCollectionId,
       queries
     );
-    console.log("files : file.actions.ts | ", files);
+    // console.log("files : file.actions.ts | ", files);
     return parseStringify(files);
   } catch (error) {
     handleError(error, "Failed to get files");

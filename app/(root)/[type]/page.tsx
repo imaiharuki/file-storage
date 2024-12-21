@@ -9,7 +9,7 @@ const page = async ({ params }: SearchParamProps) => {
   const type = ((await params)?.type as string) || "";
 
   const files = await getFiles();
-  console.log("files : page.tsx | ", files.documents);
+  // console.log("files : page.tsx | ", files.documents);
 
   return (
     <div className="page-container">
