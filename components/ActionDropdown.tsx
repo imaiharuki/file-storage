@@ -1,33 +1,23 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { ReactNode, useState } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogDescription,
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Models } from "node-appwrite";
-import { EllipsisVertical, Loader, LucideNavigation } from "lucide-react";
+import { EllipsisVertical, Loader } from "lucide-react";
 import { actionsDropdownItems } from "@/constants";
 import { ActionType } from "@/types";
 import Image from "next/image";
-import Link from "next/link";
 import { constructDownloadUrl } from "@/lib/utils";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { DialogTrigger } from "@radix-ui/react-dialog";
+import Dropdown from "react-dropdown";
 
 const ActionDropdown = ({ file }: { file: Models.Document }) => {
   const [isModalOpen, setisModalOpen] = useState(false);
@@ -41,13 +31,32 @@ const ActionDropdown = ({ file }: { file: Models.Document }) => {
     setisModalOpen(false);
     setisDropdownOpen(false);
     setAction(null);
-    // setName(file.name);
+    setName(file.name);
     // setEmails([])
     console.log("click closeAllModals");
   };
 
   const handleAction = async () => {
     // console.log("ActionDropdown : action | ");
+    setisLoading(true);
+  };
+
+  const handleSelect = (selectedOption: {
+    value: string;
+    label: ReactNode;
+  }) => {
+    const actionItem = actionsDropdownItems.find(
+      (item) => item.value === selectedOption.value
+    );
+
+    if (!actionItem) return null;
+
+    if (["rename", "share", "delete", "details"].includes(actionItem.value)) {
+      setAction(actionItem);
+      setisModalOpen(true);
+    } else if (actionItem.value === "download") {
+      window.location.href = constructDownloadUrl(file.bucketFileId);
+    }
   };
 
   const renderDialogContent = () => {
@@ -78,112 +87,48 @@ const ActionDropdown = ({ file }: { file: Models.Document }) => {
 
             <Button onClick={handleAction} className="modal-submit-button">
               <p className="capitalize">{value}</p>
-              {/* {isLoading && (
+              {isLoading && (
                 <Loader width={24} height={24} className="animate-spin" />
-              )} */}
+              )}
             </Button>
           </DialogFooter>
         )}
       </DialogContent>
     );
   };
+  const options = actionsDropdownItems.map((actionItem) => ({
+    value: actionItem.value,
+    label: (
+      <div className="flex items-center mt-2">
+        <Image
+          src={actionItem.icon}
+          width={24}
+          height={24}
+          alt={actionItem.label}
+          className="text-blue"
+        />
+        <span>{actionItem.label}</span>
+      </div>
+    ),
+  }));
 
   return (
     <div>
       <Dialog open={isModalOpen} onOpenChange={setisModalOpen}>
-        <DialogTrigger asChild>
-          <Button onClick={() => setAction(actionsDropdownItems[0])}>
-            test
-          </Button>
-        </DialogTrigger>
-        <DropdownMenu open={isDropdownOpen} onOpenChange={setisDropdownOpen}>
-          <DropdownMenuTrigger className="shad-no-focus">
-            <EllipsisVertical width={34} height={34} />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel className="max-x-[200px] truncate">
-              {file.name}
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {actionsDropdownItems.map((actionItem) => (
-              <DropdownMenuItem
-                key={actionItem.value}
-                className="shad-dropdown-item"
-                onClick={() => {
-                  setAction(actionItem);
+        <Dropdown
+          options={options}
+          value={undefined}
+          placeholder={""}
+          className="flex items-end flex-col "
+          placeholderClassName="hidden"
+          controlClassName=""
+          arrowClassName=""
+          onChange={handleSelect}
+          arrowOpen={<EllipsisVertical width={34} height={34} />}
+          arrowClosed={<EllipsisVertical width={34} height={34} />}
+        />
 
-                  if (
-                    ["rename", "share", "delete", "details"].includes(
-                      actionItem.value
-                    )
-                  ) {
-                    console.log("click setisModalOpen");
-                    setisModalOpen(true);
-                  }
-                }}
-              >
-                {actionItem.value === "download" ? (
-                  <Link
-                    href={constructDownloadUrl(file.bucketFileId)}
-                    download={file.name}
-                    className="flex items-center gap-2"
-                  >
-                    <Image
-                      src={actionItem.icon}
-                      width={24}
-                      height={24}
-                      alt={actionItem.label}
-                      className="bg-blue-100"
-                    />
-                    <p className="pl-3">{actionItem.label}</p>
-                  </Link>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <Image
-                      src={actionItem.icon}
-                      width={24}
-                      height={24}
-                      alt={actionItem.label}
-                      className="bg-blue-100"
-                    />
-                    <p className="pl-3">{actionItem.label}</p>
-                  </div>
-                )}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        {/* {renderDialogContent()} */}
-        <DialogContent className="shad-dialog button">
-          <DialogHeader className="flex flex-col gap-3">
-            <DialogTitle className="text-center text-light-100">
-              {/* {label}
-              {`ActionDropdown : value | ${value}`} */}
-              hello
-            </DialogTitle>
-            {/* {value === "rename" && (
-              <Input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            )} */}
-          </DialogHeader>
-          {/* {["rename", "delete", "share"].includes(value) && (
-            <DialogFooter className="flex flex-col gap-3">
-              <Button onClick={closeAllModals} className="modal-cancel-button">
-                Cancel
-              </Button>
-
-              <Button onClick={handleAction} className="modal-submit-button">
-                <p className="capitalize">{value}</p>
-                {isLoading && (
-                <Loader width={24} height={24} className="animate-spin" />
-              )}
-              </Button>
-            </DialogFooter>
-          )} */}
-        </DialogContent>
+        {renderDialogContent()}
       </Dialog>
     </div>
   );
