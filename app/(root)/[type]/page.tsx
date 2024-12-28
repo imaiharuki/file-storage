@@ -1,15 +1,37 @@
+"use client";
+
 import Card from "@/components/Card";
 import Sort from "@/components/ui/Sort";
 import { getFiles } from "@/lib/actions/file.actions";
-import { SearchParamProps } from "@/types";
+import { getFileTypesParams } from "@/lib/utils";
+import { FileType, SearchParamProps } from "@/types";
+import { Loader2 } from "lucide-react";
 import { Models } from "node-appwrite";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-const page = async ({ params }: SearchParamProps) => {
-  const type = ((await params)?.type as string) || "";
+const Page = ({ searchParams, params }: SearchParamProps) => {
+  const [type, setType] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [files, setFiles] =
+    useState<Models.DocumentList<Models.Document> | null>(null);
 
-  const files = await getFiles();
-  // console.log("files : page.tsx | ", files.documents);
+  useEffect(() => {
+    const fetchFiles = async () => {
+      setIsLoading(true);
+      const typeParam = ((await params)?.type as string) || "";
+      setType(typeParam);
+
+      const searchText = ((await searchParams)?.query as string) || "";
+      const sort = ((await searchParams)?.sort as string) || "";
+
+      const types = getFileTypesParams(typeParam) as FileType[];
+      const fetchedFiles = await getFiles({ types, searchText, sort });
+      setFiles(fetchedFiles);
+      setIsLoading(false);
+    };
+
+    fetchFiles();
+  }, [params]);
 
   return (
     <div className="page-container">
@@ -28,7 +50,11 @@ const page = async ({ params }: SearchParamProps) => {
           </div>
         </div>
         {/* Render the files */}
-        {files.total > 0 ? (
+        {isLoading ? (
+          <div className="flex items-center justify-center h-full pt-20 text-emerald-600">
+            <Loader2 className="animate-spin" width={54} height={54} />
+          </div>
+        ) : files && files.total > 0 ? (
           <section className="file-list">
             {files.documents.map((file: Models.Document) => (
               <Card key={file.$id} file={file} />
@@ -42,4 +68,4 @@ const page = async ({ params }: SearchParamProps) => {
   );
 };
 
-export default page;
+export default Page;

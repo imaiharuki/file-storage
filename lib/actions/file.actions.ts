@@ -9,6 +9,7 @@ import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "./user.actions";
 import {
   DeleteFileProps,
+  GetFilesProps,
   RenameFileProps,
   UpdateFileUsersProps,
   UploadFileProps,
@@ -68,7 +69,13 @@ export const uploadFile = async ({
   }
 };
 
-const createQueries = (currentUser: Models.Document) => {
+const createQueries = (
+  currentUser: Models.Document,
+  types: string[],
+  searchText: string,
+  sort: string,
+  limit: number
+) => {
   const queries = [
     Query.or([
       Query.equal("owner", [currentUser.$id]),
@@ -76,10 +83,29 @@ const createQueries = (currentUser: Models.Document) => {
     ]),
   ];
   //  TODO: search, sort, limits...
+
+  if (types.length > 0) queries.push(Query.equal("type", types));
+  if (searchText) queries.push(Query.contains("name", searchText));
+  if (limit) queries.push(Query.limit(limit));
+
+  const [sortby, orderby] = sort.split("-");
+  console.log("sortby : file.actions.ts | ", sortby);
+  console.log("orderby : file.actions.ts | ", orderby);
+  queries.push(
+    orderby === "asc" ? Query.orderAsc(sortby) : Query.orderDesc(sortby)
+  );
+
   return queries;
 };
 
-export const getFiles = async () => {
+export const getFiles = async ({
+  types = [],
+  searchText = "",
+  sort = "$createdAt-asc",
+  limit = 10,
+}: GetFilesProps) => {
+  console.log("sort : file.actions.ts | ", sort);
+  console.log("limit : file.actions.ts | ", limit);
   const { databases } = await createAdminClient();
   try {
     const currentUser = await getCurrentUser();
@@ -87,7 +113,13 @@ export const getFiles = async () => {
     if (!currentUser) {
       throw new Error("User not found");
     }
-    const queries = createQueries(currentUser);
+    const queries = createQueries(
+      currentUser,
+      (types = types),
+      searchText,
+      (sort = sort),
+      limit
+    );
 
     // console.log("queries : file.actions.ts | ", queries);
     // console.log("currentUser : file.actions.ts | ", currentUser);

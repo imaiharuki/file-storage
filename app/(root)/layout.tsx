@@ -3,8 +3,8 @@ import MobileNavigation from "@/components/MobileNavigation";
 import Sidebar from "@/components/Sidebar";
 import { Toaster } from "@/components/ui/toaster";
 import { getCurrentUser } from "@/lib/actions/user.actions";
-import { redirect } from "next/navigation";
-import React, { ReactNode } from "react";
+import { redirect, usePathname, useRouter } from "next/navigation";
+import React, { ReactNode, useEffect, useState } from "react";
 
 const Layout = async ({ children }: { children: ReactNode }) => {
   const currentUser = await getCurrentUser();
