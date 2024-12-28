@@ -18,6 +18,14 @@ import { constructDownloadUrl } from "@/lib/utils";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import Dropdown from "react-dropdown";
+import {
+  deleteFile,
+  renameFile,
+  updateFileUsers,
+} from "@/lib/actions/file.actions";
+import { usePathname } from "next/navigation";
+import { set } from "zod";
+import { FileDetails, ShareInput } from "./ActionsModalContent";
 
 const ActionDropdown = ({ file }: { file: Models.Document }) => {
   const [isModalOpen, setisModalOpen] = useState(false);
@@ -25,11 +33,13 @@ const ActionDropdown = ({ file }: { file: Models.Document }) => {
   const [action, setAction] = useState<ActionType | null>(null);
   const [name, setName] = useState(file.name);
   const [isLoading, setisLoading] = useState(false);
+  const [emails, setEmails] = useState<string[]>([]);
+
+  const path = usePathname();
 
   const closeAllModals = () => {
-    // event.stopPropagation();
     setisModalOpen(false);
-    setisDropdownOpen(false);
+    // setisDropdownOpen(false);
     setAction(null);
     setName(file.name);
     // setEmails([])
@@ -38,7 +48,37 @@ const ActionDropdown = ({ file }: { file: Models.Document }) => {
 
   const handleAction = async () => {
     // console.log("ActionDropdown : action | ");
+    if (!action) return null;
+
     setisLoading(true);
+
+    let success = false;
+
+    const actions = {
+      rename: async () => {
+        await renameFile({
+          fileId: file.$id,
+          name,
+          extension: file.extension,
+          path,
+        });
+        return true;
+      },
+      share: async () => {
+        updateFileUsers({ fileId: file.$id, emails, path });
+        return true;
+      },
+      delete: async () => {
+        deleteFile({ fileId: file.$id, bucketFileId: file.bucketFileId, path });
+        return true;
+      },
+    };
+
+    success = await actions[action.value as keyof typeof actions]();
+
+    if (success) closeAllModals();
+
+    setisLoading(false);
   };
 
   const handleSelect = (selectedOption: {
@@ -59,8 +99,21 @@ const ActionDropdown = ({ file }: { file: Models.Document }) => {
     }
   };
 
+  const handleRemoveUser = async (email: string) => {
+    const updatedEmails = emails.filter((e) => e !== email);
+
+    const success = await updateFileUsers({
+      fileId: file.$id,
+      emails: updatedEmails,
+      path,
+    });
+
+    if (success) setEmails(updatedEmails);
+    closeAllModals();
+  };
+
   const renderDialogContent = () => {
-    console.log("ActionDropdown : action | ", action);
+    // console.log("ActionDropdown : action | ", action);
     if (!action) return null;
 
     const { value, label } = action;
@@ -69,7 +122,7 @@ const ActionDropdown = ({ file }: { file: Models.Document }) => {
         <DialogHeader className="flex flex-col gap-3">
           <DialogTitle className="text-center text-light-100">
             {label}
-            {`ActionDropdown : value | ${value}`}
+            {/* {`ActionDropdown : value | ${value}`} */}
           </DialogTitle>
           {value === "rename" && (
             <Input
@@ -77,6 +130,20 @@ const ActionDropdown = ({ file }: { file: Models.Document }) => {
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
+          )}
+          {value === "details" && <FileDetails file={file} />}
+          {value === "share" && (
+            <ShareInput
+              file={file}
+              onInputChange={setEmails}
+              onRemove={handleRemoveUser}
+            />
+          )}
+          {value === "delete" && (
+            <p className="delete-configuration">
+              Are you sure you want to delete{" "}
+              <span className="delete-file-name">{file.name}</span>?
+            </p>
           )}
         </DialogHeader>
         {["rename", "delete", "share"].includes(value) && (
@@ -99,7 +166,7 @@ const ActionDropdown = ({ file }: { file: Models.Document }) => {
   const options = actionsDropdownItems.map((actionItem) => ({
     value: actionItem.value,
     label: (
-      <div className="flex items-center mt-2">
+      <div className="flex items-center mt-2 mb-2">
         <Image
           src={actionItem.icon}
           width={24}
@@ -107,7 +174,7 @@ const ActionDropdown = ({ file }: { file: Models.Document }) => {
           alt={actionItem.label}
           className="text-blue"
         />
-        <span>{actionItem.label}</span>
+        <span className="ml-2">{actionItem.label}</span>
       </div>
     ),
   }));
