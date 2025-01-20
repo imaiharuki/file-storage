@@ -180,7 +180,7 @@ const ActionDropdown = ({ file }: { file: Models.Document }) => {
   }));
 
   return (
-    <div>
+    <div className="cursor-pointer">
       <Dialog open={isModalOpen} onOpenChange={setisModalOpen}>
         <Dropdown
           options={options}
