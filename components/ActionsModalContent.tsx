@@ -1,11 +1,10 @@
 import { Models } from "node-appwrite";
-import React, { ReactNode } from "react";
+import React from "react";
 import Thumbnail from "./Thumbnail";
 import FormattedDateTime from "./FormattedDateTime";
 import { convertFileSize, formatDateTime } from "@/lib/utils";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import Image from "next/image";
 import { Trash2 } from "lucide-react";
 
 const ImageThumbnail = ({ file }: { file: Models.Document }) => (
@@ -30,7 +29,7 @@ export const FileDetails = ({ file }: { file: Models.Document }) => {
     <>
       <ImageThumbnail file={file} />
 
-      <div className="space-y-4 px-2 py-2">
+      <div className="space-y-4 p-2">
         <Detaillow label="Format:" value={file.extension} />
         <Detaillow label="Size:" value={convertFileSize(file.size)} />
         <Detaillow label="Owner:" value={file.owner.fullName} />
@@ -78,7 +77,7 @@ export const ShareInput = ({ file, onInputChange, onRemove }: Props) => {
                 <p className="subtitle-2">{email}</p>
                 <Button
                   onClick={() => onRemove(email)}
-                  className="share-remve-user"
+                  className="share-remove-user"
                 >
                   <Trash2 width={24} height={24} className="remove-icon" />
                 </Button>

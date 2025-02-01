@@ -24,12 +24,10 @@ import {
   updateFileUsers,
 } from "@/lib/actions/file.actions";
 import { usePathname } from "next/navigation";
-import { set } from "zod";
 import { FileDetails, ShareInput } from "./ActionsModalContent";
 
 const ActionDropdown = ({ file }: { file: Models.Document }) => {
   const [isModalOpen, setisModalOpen] = useState(false);
-  const [isDropdownOpen, setisDropdownOpen] = useState(false);
   const [action, setAction] = useState<ActionType | null>(null);
   const [name, setName] = useState(file.name);
   const [isLoading, setisLoading] = useState(false);

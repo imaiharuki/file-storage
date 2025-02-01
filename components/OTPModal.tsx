@@ -15,11 +15,9 @@ import {
 import {
   InputOTP,
   InputOTPGroup,
-  InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import Image from "next/image";
-import { CircleX, Loader, LoaderCircle } from "lucide-react";
+import { CircleX, LoaderCircle } from "lucide-react";
 import { Button } from "./ui/button";
 import { verifySecret, sendEmailOTP } from "@/lib/actions/user.actions";
 import { useRouter } from "next/navigation";

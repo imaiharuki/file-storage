@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -78,7 +77,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
 
       console.log(user.accountId);
       setaccountId(user.accountId);
-    } catch (error) {
+    } catch (_) {
       seterrorMessage("Failed to create account. Please try again.");
     } finally {
       setIsLoading(false);

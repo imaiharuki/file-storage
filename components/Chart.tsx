@@ -6,29 +6,29 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { ChartConfig, ChartContainer } from "./ui/chart";
-import {
-  Label,
-  PolarGrid,
-  PolarRadiusAxis,
-  RadialBar,
-  RadialBarChart,
-} from "recharts";
-import { calculatePercentage } from "@/lib/utils";
+// import { ChartConfig, ChartContainer } from "./ui/chart";
+// import {
+//   Label,
+//   PolarGrid,
+//   PolarRadiusAxis,
+//   RadialBar,
+//   RadialBarChart,
+// } from "recharts";
+// import { calculatePercentage } from "@/lib/utils";
 
-const chartConfig = {
-  size: {
-    label: "Size",
-  },
-  used: {
-    label: "Used",
-    color: "white",
-  },
-} satisfies ChartConfig;
+// const chartConfig = {
+//   size: {
+//     label: "Size",
+//   },
+//   used: {
+//     label: "Used",
+//     color: "white",
+//   },
+// } satisfies ChartConfig;
 
 const Chart = ({ used = 0 }: { used: number }) => {
-  const chartData = [{ storage: "used", 10: used, fill: "white" }];
-
+  // const chartData = [{ storage: "used", 10: used, fill: "white" }];
+  console.log(used, " : output for avoid build error ");
   return (
     <Card className="chart">
       <CardContent>

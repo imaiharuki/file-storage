@@ -114,13 +114,7 @@ export const getFiles = async ({
     if (!currentUser) {
       throw new Error("User not found");
     }
-    const queries = createQueries(
-      currentUser,
-      (types = types),
-      searchText,
-      (sort = sort),
-      limit
-    );
+    const queries = createQueries(currentUser, types, searchText, sort, limit);
 
     // console.log("queries : file.actions.ts | ", queries);
     // console.log("currentUser : file.actions.ts | ", currentUser);
@@ -234,7 +228,6 @@ export const getTotalSpaceUsed = async () => {
     files.documents.forEach((file) => {
       const fileType = file.type as FileType;
       totalSpace[fileType].size += file.size;
-
       if (
         !totalSpace[fileType].latestDate ||
         new Date(file.$createdAt) > new Date(totalSpace[fileType].latestDate)

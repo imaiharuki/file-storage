@@ -3,12 +3,10 @@
 import { createAdminClient, createSessionClient } from "@/lib/appwrite";
 import { appwriteConfig } from "@/lib/appwrite/config";
 import { ID, Query } from "node-appwrite";
-import { getCatImage } from "../getCatImage";
 import { parseStringify } from "../utils";
 import { cookies } from "next/headers";
 import { getAvatarPlaceHolderUrl } from "@/constants";
 import { redirect } from "next/navigation";
-import { error } from "console";
 
 // Create account flow
 // 1. User enters full name and email

@@ -1,7 +1,6 @@
 "use client";
 
 import { getCatImage } from "@/lib/getCatImage";
-import { LoaderCircle } from "lucide-react";
 import Image, { ImageProps } from "next/image";
 import React, { useState } from "react";
 
@@ -22,6 +21,11 @@ const CatImage = ({ initialImageUrl, imageProps = {} }: CatImageProps) => {
       setImageUrl(newImageUrl);
     } catch (error) {
       console.error(error);
+      setError(
+        error instanceof Error
+          ? error
+          : new Error("画像の読み込みに失敗しました")
+      );
     } finally {
       setIsLoading(false);
     }
