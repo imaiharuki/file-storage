@@ -114,24 +114,28 @@ export const verifySecret = async ({
 };
 
 export const getCurrentUser = async () => {
-  const { databases, account } = await createSessionClient();
+  try {
+    const { databases, account } = await createSessionClient();
 
-  const result = await account.get();
-  // debug
-  // console.log("result / getCurrentUser : user.actions.ts | \n", result);
-  const user = await databases.listDocuments(
-    appwriteConfig.databaseId,
-    appwriteConfig.usersCollectionId,
-    [Query.equal("accountId", result.$id)]
-  );
+    const result = await account.get();
+    // debug
+    // console.log("result / getCurrentUser : user.actions.ts | \n", result);
+    const user = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.usersCollectionId,
+      [Query.equal("accountId", result.$id)]
+    );
 
-  if (user.total <= 0) return null;
-  // debug
-  // console.log(
-  //   "user.document[0] / getCurrentUser : user.actions.ts | \n",
-  //   user.documents[0]
-  // );
-  return parseStringify(user.documents[0]);
+    if (user.total <= 0) return null;
+    // debug
+    // console.log(
+    //   "user.document[0] / getCurrentUser : user.actions.ts | \n",
+    //   user.documents[0]
+    // );
+    return parseStringify(user.documents[0]);
+  } catch (error) {
+    console.log;
+  }
 };
 
 export const signOutUser = async () => {
